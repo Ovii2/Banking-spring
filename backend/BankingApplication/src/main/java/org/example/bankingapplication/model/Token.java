@@ -1,10 +1,7 @@
 package org.example.bankingapplication.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.example.bankingapplication.enums.TokenType;
 
 import java.util.Set;
@@ -23,7 +20,7 @@ public class Token {
     @Column(name = "id")
     private UUID id;
 
-    @Column(name = "token", unique = true, length = 1024)
+    @Column(name = "token", unique = true, length = 2048)
     private String token;
 
     @Column(name = "token_type")
@@ -40,6 +37,6 @@ public class Token {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @ManyToMany(mappedBy = "tokens")
-    private Set<User> users;
+//    @ManyToMany(mappedBy = "tokens")
+//    private Set<User> users;
 }

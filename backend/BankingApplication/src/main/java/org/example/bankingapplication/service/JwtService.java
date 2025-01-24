@@ -35,6 +35,7 @@ public class JwtService {
         claims.put("id", user.getId());
         claims.put("username", user.getUsername());
         claims.put("email", user.getEmail());
+        claims.put("account_number", user.getAccountNumber());
         claims.put("role", user.getRole().name());
         return buildToken(claims, (UserDetails) user, jwtExpiration);
     }

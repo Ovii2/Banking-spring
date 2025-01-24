@@ -30,4 +30,11 @@ public class Account {
 
     @ManyToMany(mappedBy = "accounts")
     private Set<User> users;
+
+    @PrePersist
+    public void onCreate() {
+        if (this.balance == null) {
+            this.balance = 0.0;
+        }
+    }
 }

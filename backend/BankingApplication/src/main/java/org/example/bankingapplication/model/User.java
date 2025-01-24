@@ -45,11 +45,14 @@ public class User {
     )
     private Set<Account> accounts;
 
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(
-            name = "user_tokens",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "token_id")
-    )
+//    @ManyToMany(fetch = FetchType.EAGER)
+//    @JoinTable(
+//            name = "user_tokens",
+//            joinColumns = @JoinColumn(name = "user_id"),
+//            inverseJoinColumns = @JoinColumn(name = "token_id")
+//    )
+//    private Set<Token> tokens;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Set<Token> tokens;
 }
