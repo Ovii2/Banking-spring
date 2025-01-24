@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.Set;
 import java.util.UUID;
 
 @Entity
@@ -18,9 +19,15 @@ public class Account {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
+    @Column(name = "account_number", unique = true, nullable = false)
+    private String accountNumber;
+
     @Column(name = "owner_name")
     private String ownerName;
 
     @Column(name = "balance")
-    private Long balance;
+    private Double balance;
+
+    @ManyToMany(mappedBy = "accounts")
+    private Set<User> users;
 }
