@@ -1,9 +1,6 @@
 package org.example.bankingapplication.exceptions.handler;
 
-import org.example.bankingapplication.exceptions.UserAlreadyExistsException;
-import org.example.bankingapplication.exceptions.UserAlreadyLoggedInException;
-import org.example.bankingapplication.exceptions.UserNotFoundException;
-import org.example.bankingapplication.exceptions.UsernameOrPasswordInvalidException;
+import org.example.bankingapplication.exceptions.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -34,5 +31,11 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorDetails> exceptionUsernameOrPasswordInvalidHandler(UsernameOrPasswordInvalidException ex) {
         ErrorDetails errorDetails = new ErrorDetails(ex.getMessage());
         return new ResponseEntity<>(errorDetails, HttpStatus.UNAUTHORIZED);
+    }
+
+    @ExceptionHandler(AccountNotFoundException.class)
+    public ResponseEntity<ErrorDetails> exceptionAccountNotFoundExceptionHandler(AccountNotFoundException ex) {
+        ErrorDetails errorDetails = new ErrorDetails(ex.getMessage());
+        return new ResponseEntity<>(errorDetails, HttpStatus.NOT_FOUND);
     }
 }

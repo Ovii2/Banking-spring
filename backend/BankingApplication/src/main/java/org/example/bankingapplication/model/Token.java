@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.example.bankingapplication.enums.TokenType;
 
-import java.util.Set;
 import java.util.UUID;
 
 @Data
@@ -20,7 +19,7 @@ public class Token {
     @Column(name = "id")
     private UUID id;
 
-    @Column(name = "token", unique = true, length = 2048)
+    @Column(name = "token", unique = true, length = 1024)
     private String token;
 
     @Column(name = "token_type")
@@ -36,7 +35,4 @@ public class Token {
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
-
-//    @ManyToMany(mappedBy = "tokens")
-//    private Set<User> users;
 }

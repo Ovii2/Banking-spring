@@ -31,6 +31,9 @@ public class Account {
     @ManyToMany(mappedBy = "accounts")
     private Set<User> users;
 
+    @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Transaction> transactions;
+
     @PrePersist
     public void onCreate() {
         if (this.balance == null) {
