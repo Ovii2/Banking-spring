@@ -1,6 +1,8 @@
 package org.example.bankingapplication.service;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.example.bankingapplication.dto.account.AccountRequestDTO;
 import org.example.bankingapplication.dto.login.LoginRequestDTO;
 import org.example.bankingapplication.dto.login.LoginResponseDTO;
 import org.example.bankingapplication.dto.register.RegisterRequestDTO;
@@ -34,7 +36,9 @@ public class AuthService {
     private final TokenService tokenService;
     private final TokenRepository tokenRepository;
     private final AccountRepository accountRepository;
+    private final AccountService accountService;
 
+    @Transactional
     public RegisterResponseDTO register(RegisterRequestDTO registerRequestDTO) throws UserAlreadyExistsException {
         if (userRepository.existsUserByEmail(registerRequestDTO.getEmail())) {
             throw new UserAlreadyExistsException("Email already exists!");
@@ -56,6 +60,15 @@ public class AuthService {
                 .accountNumber(accountNumber)
                 .build();
         userRepository.save(user);
+
+        AccountRequestDTO accountRequestDTO = AccountRequestDTO.builder()
+                .userId(user.getId())
+                .accountNumber(accountNumber)
+                .initialDeposit(0.0)
+                .build();
+
+        accountService.createAccount(accountRequestDTO);
+
         return new RegisterResponseDTO(user.getId(), "User registered successfully!");
     }
 

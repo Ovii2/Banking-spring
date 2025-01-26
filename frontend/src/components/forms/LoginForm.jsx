@@ -91,7 +91,7 @@ const LoginForm = () => {
                   className='block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6'
                 />
               </div>
-              {errors.email && <div className='invalid-feedback'>{errors.email.message}</div>}
+              {errors.username && <div className='text-red-700'>{errors.username.message}</div>}
             </div>
 
             <div>
@@ -118,6 +118,7 @@ const LoginForm = () => {
                   className='block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6'
                 />
               </div>
+              {errors.password && <div className='text-red-700'>{errors.password.message}</div>}
             </div>
 
             <div>

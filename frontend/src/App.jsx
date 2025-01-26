@@ -9,6 +9,7 @@ import Header from './components/header/Header';
 import Footer from './components/footer/Footer';
 import HomePage from './pages/HomePage';
 import { ToastContainer } from 'react-toastify';
+import AccountPage from './pages/AccountPage';
 
 function App() {
   const [count, setCount] = useState(0);
@@ -21,6 +22,7 @@ function App() {
         <Route path='/' element={<HomePage />} />
         <Route path='/register' element={<RegisterPage />} />
         <Route path='/login' element={<LoginPage />} />
+        <Route path='/account' element={<AccountPage />} />
         <Route path='*' element={<NotFoundPage />} />
       </Routes>
       <Footer />

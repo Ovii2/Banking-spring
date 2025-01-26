@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.example.bankingapplication.enums.Roles;
 
+import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
@@ -22,13 +23,13 @@ public class User {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(name = "user_name")
+    @Column(name = "user_name", nullable = false)
     private String username;
 
-    @Column(name = "email")
+    @Column(name = "email", nullable = false, unique = true)
     private String email;
 
-    @Column(name = "password")
+    @Column(name = "password", nullable = false)
     private String password;
 
     @Column(name = "account_number", nullable = false, unique = true)
@@ -38,15 +39,10 @@ public class User {
     @Enumerated(EnumType.STRING)
     private Roles role;
 
-    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    @JoinTable(
-            name = "user_accounts",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "account_id")
-    )
-    private Set<Account> accounts;
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Account> accounts = new HashSet<>();
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(
             name = "user_transactions",
             joinColumns = @JoinColumn(name = "user_id"),
@@ -54,6 +50,6 @@ public class User {
     )
     private Set<Transaction> transactions;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Set<Token> tokens;
 }
