@@ -9,7 +9,7 @@ import {
   MenuItems,
 } from '@headlessui/react';
 import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 
 const navigation = [
   { name: 'Home', href: '/' },
@@ -22,11 +22,7 @@ function classNames(...classes) {
 }
 
 const Navigation = () => {
-  const [currentPage, setCurrentPage] = useState('/');
-
-  const handleNavigationClick = (href) => {
-    setCurrentPage(href);
-  };
+  const location = useLocation();
 
   return (
     <Disclosure as='nav' className='bg-gray-700'>
@@ -55,12 +51,9 @@ const Navigation = () => {
                   <Link
                     key={item.name}
                     to={item.href}
-                    onClick={(e) => {
-                      handleNavigationClick(item.href);
-                    }}
-                    aria-current={currentPage === item.href ? 'page' : undefined}
+                    aria-current={location.pathname === item.href ? 'page' : undefined}
                     className={classNames(
-                      currentPage === item.href
+                      location.pathname === item.href
                         ? 'bg-gray-900 text-white'
                         : 'text-gray-300 hover:bg-gray-700 hover:text-white',
                       'rounded-md px-3 py-2 text-sm font-medium'
@@ -136,12 +129,9 @@ const Navigation = () => {
               key={item.name}
               as='a'
               href={item.href}
-              onClick={(e) => {
-                handleNavigationClick(item.href);
-              }}
-              aria-current={currentPage === item.href ? 'page' : undefined}
+              aria-current={location.pathname === item.href ? 'page' : undefined}
               className={classNames(
-                currentPage === item.href
+                location.pathname === item.href
                   ? 'bg-gray-900 text-white'
                   : 'text-gray-300 hover:bg-gray-700 hover:text-white',
                 'block rounded-md px-3 py-2 text-base font-medium'

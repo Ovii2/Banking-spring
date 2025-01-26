@@ -8,12 +8,14 @@ import NotFoundPage from './pages/NotFoundPage';
 import Header from './components/header/Header';
 import Footer from './components/footer/Footer';
 import HomePage from './pages/HomePage';
+import { ToastContainer } from 'react-toastify';
 
 function App() {
   const [count, setCount] = useState(0);
 
   return (
     <>
+      <ToastContainer autoClose={1200} position='top-center' />
       <Header />
       <Routes>
         <Route path='/' element={<HomePage />} />
