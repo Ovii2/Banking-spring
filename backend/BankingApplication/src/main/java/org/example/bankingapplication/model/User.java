@@ -31,10 +31,11 @@ public class User {
     @Column(name = "password")
     private String password;
 
-    @Column(name = "account_number")
+    @Column(name = "account_number", nullable = false, unique = true)
     private String accountNumber;
 
-    @Column(name = "role")
+    @Column(name = "role", nullable = false)
+    @Enumerated(EnumType.STRING)
     private Roles role;
 
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)

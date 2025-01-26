@@ -9,7 +9,6 @@ import java.util.Collection;
 import java.util.List;
 
 @RequiredArgsConstructor
-
 public class CustomUserDetails implements UserDetails {
 
     private final User user;

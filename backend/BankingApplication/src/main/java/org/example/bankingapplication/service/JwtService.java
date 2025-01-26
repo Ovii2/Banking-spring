@@ -6,6 +6,7 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.example.bankingapplication.model.User;
+import org.example.bankingapplication.userDetails.CustomUserDetails;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -37,7 +38,9 @@ public class JwtService {
         claims.put("email", user.getEmail());
         claims.put("account_number", user.getAccountNumber());
         claims.put("role", user.getRole().name());
-        return buildToken(claims, (UserDetails) user, jwtExpiration);
+
+        UserDetails userDetails = new CustomUserDetails(user);
+        return buildToken(claims, userDetails, jwtExpiration);
     }
 
     public String generateRefreshToken(UserDetails userDetails) {
