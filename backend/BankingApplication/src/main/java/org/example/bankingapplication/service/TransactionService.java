@@ -13,7 +13,10 @@ import org.example.bankingapplication.repository.TransactionRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -57,6 +60,24 @@ public class TransactionService {
                 .transactionType(TransactionType.DEPOSIT)
                 .transactionDate(savedTransaction.getTransactionDate())
                 .build();
+    }
+
+    public List<TransactionResponseDTO> getAllTransactionsByUserId(UUID userId) {
+        Account account = accountRepository.findByUserId(userId)
+                .orElseThrow(() -> new AccountNotFoundException("Account not found"));
+
+        List<Transaction> transactions = transactionRepository.findByAccountOrderByTransactionDateDesc(account);
+
+        return transactions.stream()
+                .map(transaction -> TransactionResponseDTO.builder()
+                        .transactionId(transaction.getId())
+                        .accountNumber(transaction.getAccount().getAccountNumber())
+                        .amount(transaction.getAmount())
+                        .balance(transaction.getAccount().getBalance())
+                        .transactionType(transaction.getTransactionType())
+                        .transactionDate(transaction.getTransactionDate())
+                        .build())
+                .collect(Collectors.toList());
     }
 }
 

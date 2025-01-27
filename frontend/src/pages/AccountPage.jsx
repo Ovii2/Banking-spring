@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from 'react';
-import { getAccountDataByUserId } from '../services/get';
+import { getAccountDataByUserId, getUserTransactions } from '../services/get';
 import { getUserIdFromToken } from '../utils/jwt';
 import UserContext from '../context/UserContext';
 import { postDeposit } from '../services/post';
@@ -16,6 +16,7 @@ const AccountPage = () => {
   const [amount, setAmount] = useState('');
   const [targetAccount, setTargetAccount] = useState('');
   const [recipientAccount, setRecipientAccount] = useState('');
+  const [transactions, setTransactions] = useState([]);
 
   useEffect(() => {
     if (!token) {
@@ -25,7 +26,6 @@ const AccountPage = () => {
     }
 
     const userId = getUserIdFromToken(token);
-
     if (!userId) {
       setError('Invalid user token');
       setLoading(false);
@@ -34,8 +34,13 @@ const AccountPage = () => {
 
     const fetchData = async () => {
       try {
-        const data = await getAccountDataByUserId(userId);
-        setAccountData(data);
+        const [accountData, transactionsData] = await Promise.all([
+          getAccountDataByUserId(userId),
+          getUserTransactions(userId),
+        ]);
+
+        setAccountData(accountData);
+        setTransactions(transactionsData);
       } catch (err) {
         setError(err.message);
       } finally {
@@ -44,7 +49,7 @@ const AccountPage = () => {
     };
 
     fetchData();
-  }, [token]);
+  }, [token, amount]);
 
   if (loading) return <p>Loading...</p>;
   if (error) return <p className='text-red-500'>{error}</p>;
@@ -193,11 +198,42 @@ const AccountPage = () => {
               </tr>
             </thead>
             <tbody>
-              <tr>
-                <td className='border border-gray-300 px-4 py-2 text-gray-600'>-</td>
-                <td className='border border-gray-300 px-4 py-2 text-gray-600'>-</td>
-                <td className='border border-gray-300 px-4 py-2 text-gray-600'>-</td>
-              </tr>
+              {transactions.map((transaction) => {
+                const formatDate = (dateString) => {
+                  const date = new Date(dateString);
+                  const year = date.getFullYear();
+                  const month = String(date.getMonth() + 1).padStart(2, '0');
+                  const day = String(date.getDate()).padStart(2, '0');
+                  const hours = String(date.getHours()).padStart(2, '0');
+                  const minutes = String(date.getMinutes()).padStart(2, '0');
+                  const seconds = String(date.getSeconds()).padStart(2, '0');
+
+                  return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+                };
+
+                return (
+                  <tr key={transaction.transactionId}>
+                    <td
+                      className={`border border-gray-300 px-4 py-2 ${
+                        transaction.transactionType === 'DEPOSIT'
+                          ? 'text-green-500'
+                          : 'text-red-500'
+                      }`}
+                    >
+                      {transaction.transactionType === 'DEPOSIT'
+                        ? `+${transaction.amount.toFixed(2)}`
+                        : `-${transaction.amount.toFixed(2)}`}{' '}
+                      EUR
+                    </td>
+                    <td className='border border-gray-300 px-4 py-2 text-gray-600'>
+                      {transaction.accountNumber}
+                    </td>
+                    <td className='border border-gray-300 px-4 py-2 text-gray-600'>
+                      {formatDate(transaction.transactionDate)}
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
