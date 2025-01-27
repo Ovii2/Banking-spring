@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import {
   Disclosure,
   DisclosureButton,
@@ -10,6 +10,7 @@ import {
 } from '@headlessui/react';
 import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import { Link, useLocation } from 'react-router-dom';
+import UserContext from '../../context/UserContext';
 
 const navigation = [
   { name: 'Home', href: '/' },
@@ -23,6 +24,7 @@ function classNames(...classes) {
 }
 
 const Navigation = () => {
+  const { logoutHandler, isLoggedIn } = useContext(UserContext);
   const location = useLocation();
 
   return (
@@ -109,14 +111,16 @@ const Navigation = () => {
                     Settings
                   </a>
                 </MenuItem>
-                <MenuItem>
-                  <a
-                    href='#'
-                    className='block px-4 py-2 text-sm text-gray-700 data-focus:bg-gray-100 data-focus:outline-hidden'
-                  >
-                    Sign out
-                  </a>
-                </MenuItem>
+                {isLoggedIn && (
+                  <MenuItem>
+                    <button
+                      onClick={logoutHandler}
+                      className='w-full text-left px-4 py-2 text-sm text-red-400 data-focus:bg-gray-100 data-focus:outline-hidden'
+                    >
+                      Sign out
+                    </button>
+                  </MenuItem>
+                )}
               </MenuItems>
             </Menu>
           </div>

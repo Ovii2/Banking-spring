@@ -52,7 +52,7 @@ const AccountPage = () => {
   }, [token, amount]);
 
   if (loading) return <p>Loading...</p>;
-  if (error) return <p className='text-red-500'>{error}</p>;
+  // if (error) return <p className='text-red-500'>{error}</p>;
 
   const handleDeposit = async () => {
     try {

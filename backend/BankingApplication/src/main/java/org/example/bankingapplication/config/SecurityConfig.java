@@ -27,7 +27,7 @@ public class SecurityConfig {
     private final CorsConfig corsConfig;
     private final LogoutHandler logoutHandler;
 
-    private static final String[] WHITE_LIST_URL = {"/api/v1/auth/register", "/api/v1/auth/login", "/error"};
+    private static final String[] WHITE_LIST_URL = {"/api/v1/auth/register", "/api/v1/auth/login", "/api/v1/auth/logout", "/error"};
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {

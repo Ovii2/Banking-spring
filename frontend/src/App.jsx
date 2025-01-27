@@ -15,18 +15,20 @@ function App() {
   const [count, setCount] = useState(0);
 
   return (
-    <>
+    <div className='flex flex-col min-h-screen'>
       <ToastContainer autoClose={1200} position='top-center' />
       <Header />
-      <Routes>
-        <Route path='/' element={<HomePage />} />
-        <Route path='/register' element={<RegisterPage />} />
-        <Route path='/login' element={<LoginPage />} />
-        <Route path='/account' element={<AccountPage />} />
-        <Route path='*' element={<NotFoundPage />} />
-      </Routes>
+      <main className='flex-grow'>
+        <Routes>
+          <Route path='/' element={<HomePage />} />
+          <Route path='/register' element={<RegisterPage />} />
+          <Route path='/login' element={<LoginPage />} />
+          <Route path='/account' element={<AccountPage />} />
+          <Route path='*' element={<NotFoundPage />} />
+        </Routes>
+      </main>
       <Footer />
-    </>
+    </div>
   );
 }
 

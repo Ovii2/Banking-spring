@@ -62,6 +62,7 @@ public class TransactionService {
                 .build();
     }
 
+    @Transactional
     public List<TransactionResponseDTO> getAllTransactionsByUserId(UUID userId) {
         Account account = accountRepository.findByUserId(userId)
                 .orElseThrow(() -> new AccountNotFoundException("Account not found"));

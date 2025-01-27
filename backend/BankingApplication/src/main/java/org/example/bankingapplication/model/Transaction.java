@@ -34,9 +34,6 @@ public class Transaction {
     @Column(name = "amount", nullable = false)
     private Double amount;
 
-    @ManyToMany(mappedBy = "transactions")
-    private Set<User> users;
-
     @ManyToOne
     @JoinColumn(name = "account_id", nullable = false)
     private Account account;

@@ -1,11 +1,13 @@
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { useForm } from 'react-hook-form';
 import { loginPost } from '../../services/post';
+import UserContext from '../../context/UserContext';
 
 const LoginForm = () => {
   const [error, setError] = useState('');
+  const { setToken } = useContext(UserContext);
 
   const {
     register,
@@ -25,9 +27,11 @@ const LoginForm = () => {
     try {
       const response = await loginPost(data);
       localStorage.setItem('token', response.token);
+      setToken(response.token);
       reset();
-      navigate('/account', { replace: true });
       toast.success('Login successfull!');
+      // navigate('/account', { replace: true });
+      window.location.replace('/account');
     } catch (error) {
       toast.error('Invalid email or password');
     }
