@@ -13,7 +13,7 @@ import { Link, useLocation } from 'react-router-dom';
 import UserContext from '../../context/UserContext';
 
 const navigation = [
-  { name: 'Home', href: '/' },
+  { name: 'Home', href: '/home' },
   { name: 'Login', href: '/login' },
   { name: 'Register', href: '/register' },
   { name: 'Account', href: '/account' },
@@ -26,6 +26,12 @@ function classNames(...classes) {
 const Navigation = () => {
   const { logoutHandler, isLoggedIn } = useContext(UserContext);
   const location = useLocation();
+
+  const filteredNavigation = isLoggedIn
+    ? navigation.filter((item) => item.name === 'Home' || item.name === 'Account')
+    : navigation.filter(
+        (item) => item.name === 'Home' || item.name === 'Login' || item.name === 'Register'
+      );
 
   return (
     <Disclosure as='nav' className='bg-gray-700'>
@@ -50,7 +56,7 @@ const Navigation = () => {
             </div>
             <div className='hidden sm:ml-6 sm:block'>
               <div className='flex space-x-4'>
-                {navigation.map((item) => (
+                {filteredNavigation.map((item) => (
                   <Link
                     key={item.name}
                     to={item.href}
