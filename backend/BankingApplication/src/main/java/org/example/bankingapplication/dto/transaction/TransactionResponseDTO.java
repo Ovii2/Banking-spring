@@ -21,5 +21,9 @@ public class TransactionResponseDTO {
     private Double balance;
     private TransactionType transactionType;
     private LocalDateTime transactionDate;
+    private String message;
 
+    public TransactionResponseDTO(String message) {
+        this.message = message;
+    }
 }

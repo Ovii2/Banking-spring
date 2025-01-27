@@ -2,6 +2,8 @@ import { useContext, useEffect, useState } from 'react';
 import { getAccountDataByUserId } from '../services/get';
 import { getUserIdFromToken } from '../utils/jwt';
 import UserContext from '../context/UserContext';
+import { postDeposit } from '../services/post';
+import { toast } from 'react-toastify';
 
 const AccountPage = () => {
   const { token } = useContext(UserContext);
@@ -32,7 +34,7 @@ const AccountPage = () => {
 
     const fetchData = async () => {
       try {
-        const data = await getAccountDataByUserId(userId);        
+        const data = await getAccountDataByUserId(userId);
         setAccountData(data);
       } catch (err) {
         setError(err.message);
@@ -46,6 +48,22 @@ const AccountPage = () => {
 
   if (loading) return <p>Loading...</p>;
   if (error) return <p className='text-red-500'>{error}</p>;
+
+  const handleDeposit = async () => {
+    try {
+      const response = await postDeposit(amount, accountData.accountNumber);
+      setAccountData({
+        ...accountData,
+        balance: response.balance,
+      });
+      setAmount('');
+      setShowDepositInput(false);
+      toast.success('Deposit successful');
+    } catch (error) {
+      toast.error('Error depositing funds');
+      console.error(error);
+    }
+  };
 
   return (
     <>
@@ -109,7 +127,7 @@ const AccountPage = () => {
             />
             <button
               className='mt-4 px-6 py-2 bg-blue-500 text-white rounded-lg shadow hover:bg-blue-600'
-              onClick={() => {}}
+              onClick={handleDeposit}
             >
               Confirm Deposit
             </button>

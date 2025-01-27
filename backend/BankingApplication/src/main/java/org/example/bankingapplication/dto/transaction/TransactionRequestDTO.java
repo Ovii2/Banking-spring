@@ -16,6 +16,4 @@ public class TransactionRequestDTO {
     private String accountNumber;
     private Double amount;
     private TransactionType transactionType;
-
-
 }

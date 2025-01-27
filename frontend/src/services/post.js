@@ -27,3 +27,25 @@ export const postRegister = async (data) => {
     throw new Error(`Failed to save data: ${error.message}`);
   }
 };
+
+export const postDeposit = async (amount, accountNumber) => {
+  const token = localStorage.getItem('token');
+  try {
+    const resp = await axios.post(
+      `${API_URL}/api/v1/account/transactions/deposit`,
+      {
+        amount: parseFloat(amount),
+        accountNumber: accountNumber,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+    return resp.data;
+  } catch (error) {
+    throw new Error(`Error depositing funds: ${error.message}`);
+  }
+};

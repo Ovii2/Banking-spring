@@ -8,6 +8,8 @@ import lombok.NoArgsConstructor;
 import org.example.bankingapplication.enums.TransactionType;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Set;
 import java.util.UUID;
 
@@ -41,6 +43,6 @@ public class Transaction {
 
     @PrePersist
     public void prePersist() {
-        this.transactionDate = LocalDateTime.now();
+        this.transactionDate = ZonedDateTime.now(ZoneId.systemDefault()).toLocalDateTime();
     }
 }
