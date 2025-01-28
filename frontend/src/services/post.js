@@ -49,3 +49,25 @@ export const postDeposit = async (amount, accountNumber) => {
     throw new Error(`Error depositing funds: ${error.message}`);
   }
 };
+
+export const postWithdraw = async (amount, accountNumber) => {
+  const token = localStorage.getItem('token');
+  try {
+    const resp = await axios.post(
+      `${API_URL}/api/v1/account/transactions/withdraw`,
+      {
+        amount: parseFloat(amount),
+        accountNumber: accountNumber,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+    return resp.data;
+  } catch (error) {
+    throw new Error(`Error withdrawing funds: ${error.message}`);
+  }
+};

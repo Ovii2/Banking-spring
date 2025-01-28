@@ -28,7 +28,7 @@ const Navigation = () => {
   const location = useLocation();
 
   const filteredNavigation = isLoggedIn
-    ? navigation.filter((item) => item.name === 'Home' || item.name === 'Account')
+    ? navigation.filter((item) => item.name === 'Account')
     : navigation.filter(
         (item) => item.name === 'Home' || item.name === 'Login' || item.name === 'Register'
       );

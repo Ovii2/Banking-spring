@@ -34,6 +34,18 @@ public class TransactionController {
         }
     }
 
+    @PostMapping("/withdraw")
+    public ResponseEntity<TransactionResponseDTO> withdrawFunds(@Valid @RequestBody TransactionRequestDTO transactionRequestDTO) {
+        try {
+            TransactionResponseDTO response = transactionService.withdraw(transactionRequestDTO);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new TransactionResponseDTO(e.getMessage()));
+        } catch (AccountNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new TransactionResponseDTO(e.getMessage()));
+        }
+    }
+
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<TransactionResponseDTO>> getUserTransactions(@PathVariable UUID userId) {
         try {

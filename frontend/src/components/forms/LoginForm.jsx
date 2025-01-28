@@ -29,8 +29,7 @@ const LoginForm = () => {
       localStorage.setItem('token', response.token);
       setToken(response.token);
       reset();
-      toast.success('Login successfull!');
-      // navigate('/account', { replace: true });
+      toast.success('Login successfull!');      
       window.location.replace('/account');
     } catch (error) {
       toast.error('Invalid email or password');
