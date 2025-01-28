@@ -1,6 +1,8 @@
 import axios from 'axios';
 const API_URL = import.meta.env.VITE_API_URL;
 
+const token = localStorage.getItem('token');
+
 export const postData = async (data) => {
   try {
     const response = await axios.post(API_URL, data);
@@ -29,7 +31,6 @@ export const postRegister = async (data) => {
 };
 
 export const postDeposit = async (amount, accountNumber) => {
-  const token = localStorage.getItem('token');
   try {
     const resp = await axios.post(
       `${API_URL}/api/v1/account/transactions/deposit`,
@@ -51,7 +52,6 @@ export const postDeposit = async (amount, accountNumber) => {
 };
 
 export const postWithdraw = async (amount, accountNumber) => {
-  const token = localStorage.getItem('token');
   try {
     const resp = await axios.post(
       `${API_URL}/api/v1/account/transactions/withdraw`,
@@ -69,5 +69,27 @@ export const postWithdraw = async (amount, accountNumber) => {
     return resp.data;
   } catch (error) {
     throw new Error(`Error withdrawing funds: ${error.message}`);
+  }
+};
+
+export const postTransfer = async (amount, accountNumber, recipientAccountNumber) => {
+  try {
+    const resp = await axios.post(
+      `${API_URL}/api/v1/account/transactions/transfer`,
+      {
+        amount: parseFloat(amount),
+        accountNumber: accountNumber,
+        recipientAccountNumber: recipientAccountNumber,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+    return resp.data;
+  } catch (error) {
+    throw new Error(`Error transferring funds: ${error.message}`);
   }
 };

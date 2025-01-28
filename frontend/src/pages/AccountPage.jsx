@@ -1,8 +1,8 @@
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 import { getAccountDataByUserId, getUserTransactions } from '../services/get';
 import { getUserIdFromToken } from '../utils/jwt';
 import UserContext from '../context/UserContext';
-import { postDeposit, postWithdraw } from '../services/post';
+import { postDeposit, postTransfer, postWithdraw } from '../services/post';
 import { toast } from 'react-toastify';
 
 const AccountPage = () => {
@@ -18,7 +18,11 @@ const AccountPage = () => {
   const [recipientAccount, setRecipientAccount] = useState('');
   const [transactions, setTransactions] = useState([]);
 
-  useEffect(() => {
+  const refreshIntervalRef = useRef(null);
+
+  console.log('transactions ===', transactions);
+
+  const fetchData = async () => {
     if (!token) {
       setError('User is not logged in');
       setLoading(false);
@@ -32,31 +36,46 @@ const AccountPage = () => {
       return;
     }
 
-    const fetchData = async () => {
-      try {
-        const [accountData, transactionsData] = await Promise.all([
-          getAccountDataByUserId(userId),
-          getUserTransactions(userId),
-        ]);
+    try {
+      const [accountData, transactionsData] = await Promise.all([
+        getAccountDataByUserId(userId),
+        getUserTransactions(userId),
+      ]);
 
-        setAccountData(accountData);
-        setTransactions(transactionsData);
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
+      setAccountData(accountData);
+      setTransactions(transactionsData);
+      setLoading(false);
+    } catch (err) {
+      setError(err.message);
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+
+    refreshIntervalRef.current = setInterval(fetchData, 5000);
+
+    return () => {
+      if (refreshIntervalRef.current) {
+        clearInterval(refreshIntervalRef.current);
       }
     };
-
-    fetchData();
-  }, [token, amount]);
+  }, [token]);
 
   if (loading) return <p>Loading...</p>;
-  // if (error) return <p className='text-red-500'>{error}</p>;
+  if (!accountData) return <p>No account data available</p>;
 
   const handleDeposit = async () => {
     try {
+      const updatedBalance = accountData.balance + parseFloat(amount);
+      setAccountData({
+        ...accountData,
+        balance: updatedBalance,
+      });
+
       const response = await postDeposit(amount, accountData.accountNumber);
+
       setAccountData({
         ...accountData,
         balance: response.balance,
@@ -64,7 +83,13 @@ const AccountPage = () => {
       setAmount('');
       setShowDepositInput(false);
       toast.success('Deposit successful');
+
+      fetchData();
     } catch (error) {
+      setAccountData({
+        ...accountData,
+        balance: accountData.balance,
+      });
       toast.error('Error depositing funds');
       console.error(error);
     }
@@ -72,7 +97,14 @@ const AccountPage = () => {
 
   const handleWithdraw = async () => {
     try {
+      const updatedBalance = accountData.balance - parseFloat(amount);
+      setAccountData({
+        ...accountData,
+        balance: updatedBalance,
+      });
+
       const response = await postWithdraw(amount, accountData.accountNumber);
+
       setAccountData({
         ...accountData,
         balance: response.balance,
@@ -80,8 +112,44 @@ const AccountPage = () => {
       setAmount('');
       setShowWithdrawInput(false);
       toast.success('Withdraw successful');
+
+      fetchData();
     } catch (error) {
+      setAccountData({
+        ...accountData,
+        balance: accountData.balance,
+      });
       toast.error('Error withdrawing funds');
+      console.error(error);
+    }
+  };
+
+  const handleTransfer = async () => {
+    try {
+      const updatedBalance = accountData.balance - parseFloat(amount);
+      setAccountData({
+        ...accountData,
+        balance: updatedBalance,
+      });
+
+      const response = await postTransfer(amount, accountData.accountNumber, recipientAccount);
+
+      setAccountData({
+        ...accountData,
+        balance: response.balance,
+      });
+      setAmount('');
+      setRecipientAccount('');
+      setShowTransferInput(false);
+      toast.success('Transfer successful');
+
+      fetchData();
+    } catch (error) {
+      setAccountData({
+        ...accountData,
+        balance: accountData.balance,
+      });
+      toast.error('Error transferring funds');
       console.error(error);
     }
   };
@@ -93,17 +161,17 @@ const AccountPage = () => {
         <div className='mb-4 sm:mb-8 bg-white rounded-lg shadow p-4 sm:p-6'>
           <p className='text-xl sm:text-2xl font-semibold text-gray-700'>Account Balance:</p>
           <p className='mt-2 sm:mt-4 text-2xl sm:text-3xl font-bold text-green-500'>
-            {accountData.balance.toFixed(2)} EUR
+            {accountData?.balance?.toFixed(2)} EUR
           </p>
         </div>
 
         {/* Account Info Card */}
         <div className='mb-4 sm:mb-8 bg-white rounded-lg shadow p-4 sm:p-6'>
           <p className='text-base sm:text-lg text-gray-700'>
-            {`${accountData.ownerName} Bank Account` || 'Bank Account'}
+            {`${accountData?.ownerName} Bank Account` || 'Bank Account'}
           </p>
           <p className='text-lg sm:text-xl font-medium text-gray-900 mt-2'>
-            {accountData.accountNumber}
+            {accountData?.accountNumber}
           </p>
         </div>
 
@@ -206,7 +274,7 @@ const AccountPage = () => {
               />
               <button
                 className='w-full sm:w-auto px-4 sm:px-6 py-2 bg-green-700 text-white rounded-lg shadow hover:bg-green-600'
-                onClick={() => {}}
+                onClick={handleTransfer}
               >
                 Confirm Transfer
               </button>
@@ -248,18 +316,22 @@ const AccountPage = () => {
                   <tr key={transaction.transactionId}>
                     <td
                       className={`border border-gray-300 px-2 sm:px-4 py-2 ${
-                        transaction.transactionType === 'DEPOSIT'
+                        transaction.transactionType === 'DEPOSIT' ||
+                        transaction.transactionType === 'TRANSFER_IN'
                           ? 'text-green-500'
                           : 'text-red-500'
                       }`}
                     >
-                      {transaction.transactionType === 'DEPOSIT'
+                      {transaction.transactionType === 'DEPOSIT' ||
+                      transaction.transactionType === 'TRANSFER_IN'
                         ? `+${transaction.amount.toFixed(2)}`
                         : `-${transaction.amount.toFixed(2)}`}{' '}
                       EUR
                     </td>
                     <td className='border border-gray-300 px-2 sm:px-4 py-2 text-gray-600'>
-                      {transaction.accountNumber}
+                      {transaction.senderAccountNumber !== transaction.recipientAccountNumber
+                        ? transaction.senderAccountNumber
+                        : transaction.recipientAccountNumber}
                     </td>
                     <td className='border border-gray-300 px-2 sm:px-4 py-2 text-gray-600'>
                       {formatDate(transaction.transactionDate)}

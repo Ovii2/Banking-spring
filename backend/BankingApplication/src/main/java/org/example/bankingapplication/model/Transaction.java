@@ -38,6 +38,10 @@ public class Transaction {
     @JoinColumn(name = "account_id", nullable = false)
     private Account account;
 
+    @ManyToOne
+    @JoinColumn(name = "receiver_account_id", nullable = true)
+    private Account receiverAccount;
+
     @PrePersist
     public void prePersist() {
         this.transactionDate = ZonedDateTime.now(ZoneId.systemDefault()).toLocalDateTime();

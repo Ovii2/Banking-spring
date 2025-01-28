@@ -53,7 +53,7 @@ public class TransactionService {
 
         return TransactionResponseDTO.builder()
                 .transactionId(savedTransaction.getId())
-                .accountNumber(account.getAccountNumber())
+//                .accountNumber(account.getAccountNumber())
                 .balance(newBalance)
                 .transactionType(TransactionType.DEPOSIT)
                 .transactionDate(savedTransaction.getTransactionDate())
@@ -71,7 +71,7 @@ public class TransactionService {
         }
         Account account = optionalAccount.get();
 
-        if (account.getBalance() < transactionRequestDTO.getAmount()){
+        if (account.getBalance() < transactionRequestDTO.getAmount()) {
             throw new IllegalArgumentException("Insufficient funds");
         }
 
@@ -91,10 +91,61 @@ public class TransactionService {
 
         return TransactionResponseDTO.builder()
                 .transactionId(savedTransaction.getId())
-                .accountNumber(account.getAccountNumber())
                 .balance(newBalance)
                 .transactionType(TransactionType.WITHDRAW)
                 .transactionDate(savedTransaction.getTransactionDate())
+                .build();
+    }
+
+    @Transactional
+    public TransactionResponseDTO transfer(TransactionRequestDTO transactionRequestDTO) {
+        checkAmount(transactionRequestDTO.getAmount());
+
+        Optional<Account> sender = accountRepository.findByAccountNumber(transactionRequestDTO.getAccountNumber());
+        Optional<Account> receiver = accountRepository.findByAccountNumber(transactionRequestDTO.getRecipientAccountNumber());
+
+        if (sender.isEmpty() || receiver.isEmpty()) {
+            throw new AccountNotFoundException("Account not found");
+        }
+        Account senderAccount = sender.get();
+        Account receiverAccount = receiver.get();
+
+        if (senderAccount.getBalance() < transactionRequestDTO.getAmount()) {
+            throw new IllegalArgumentException("Insufficient funds");
+        }
+
+        Double newBalanceSender = senderAccount.getBalance() - transactionRequestDTO.getAmount();
+        Double newBalanceReceiver = receiverAccount.getBalance() + transactionRequestDTO.getAmount();
+        senderAccount.setBalance(newBalanceSender);
+        receiverAccount.setBalance(newBalanceReceiver);
+
+        Transaction senderTransaction = Transaction.builder()
+                .transactionType(TransactionType.TRANSFER_OUT)
+                .amount(transactionRequestDTO.getAmount())
+                .account(senderAccount)
+                .transactionDate(LocalDateTime.now())
+                .build();
+
+        Transaction receiverTransaction = Transaction.builder()
+                .transactionType(TransactionType.TRANSFER_IN)
+                .amount(transactionRequestDTO.getAmount())
+                .account(receiverAccount)
+                .receiverAccount(receiverAccount)
+                .transactionDate(LocalDateTime.now())
+                .build();
+
+        transactionRepository.save(senderTransaction);
+        transactionRepository.save(receiverTransaction);
+        accountRepository.save(senderAccount);
+        accountRepository.save(receiverAccount);
+
+        return TransactionResponseDTO.builder()
+                .transactionId(senderTransaction.getId())
+                .senderAccountNumber(senderAccount.getAccountNumber())
+                .recipientAccountNumber(receiverAccount.getAccountNumber())
+                .balance(newBalanceSender)
+                .transactionType(TransactionType.TRANSFER_OUT)
+                .transactionDate(senderTransaction.getTransactionDate())
                 .build();
     }
 
@@ -108,7 +159,8 @@ public class TransactionService {
         return transactions.stream()
                 .map(transaction -> TransactionResponseDTO.builder()
                         .transactionId(transaction.getId())
-                        .accountNumber(transaction.getAccount().getAccountNumber())
+                        .senderAccountNumber(transaction.getAccount().getAccountNumber())
+                        .recipientAccountNumber(transaction.getReceiverAccount() != null ? transaction.getReceiverAccount().getAccountNumber() : null)
                         .amount(transaction.getAmount())
                         .balance(transaction.getAccount().getBalance())
                         .transactionType(transaction.getTransactionType())

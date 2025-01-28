@@ -16,7 +16,8 @@ import java.util.UUID;
 public class TransactionResponseDTO {
 
     private UUID transactionId;
-    private String accountNumber;
+    private String senderAccountNumber;
+    private String recipientAccountNumber;
     private Double amount;
     private Double balance;
     private TransactionType transactionType;
