@@ -34,13 +34,11 @@ public class Transaction {
     @Column(name = "amount", nullable = false)
     private Double amount;
 
-    @ManyToOne
-    @JoinColumn(name = "account_id", nullable = false)
-    private Account account;
+    @JoinColumn(name = "account_number", nullable = false)
+    private String accountNumber;
 
-    @ManyToOne
-    @JoinColumn(name = "receiver_account_id", nullable = true)
-    private Account receiverAccount;
+    @JoinColumn(name = "receiver_account_number", nullable = false)
+    private String receiverAccountNumber;
 
     @PrePersist
     public void prePersist() {

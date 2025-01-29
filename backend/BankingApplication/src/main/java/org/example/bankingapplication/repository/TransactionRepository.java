@@ -11,5 +11,10 @@ import java.util.UUID;
 @Repository
 public interface TransactionRepository extends JpaRepository<Transaction, UUID> {
 
-    List<Transaction> findByAccountOrderByTransactionDateDesc(Account account);
+    List<Transaction> findByAccountNumberOrderByTransactionDateDesc(String accountNumber);
+
+    List<Transaction> findByAccountNumber(Account accountNumber);
+
+    List<Transaction> findByReceiverAccountNumber(Account receiverAccountNumber);
+
 }

@@ -2,6 +2,7 @@ package org.example.bankingapplication.service;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.example.bankingapplication.dto.transaction.TransactionRequestDTO;
 import org.example.bankingapplication.dto.transaction.TransactionResponseDTO;
 import org.example.bankingapplication.enums.TransactionType;
@@ -14,10 +15,10 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class TransactionService {
@@ -30,12 +31,8 @@ public class TransactionService {
     public TransactionResponseDTO deposit(TransactionRequestDTO transactionRequestDTO) {
         checkAmount(transactionRequestDTO.getAmount());
 
-        Optional<Account> optionalAccount = accountRepository.findByAccountNumber(transactionRequestDTO.getAccountNumber());
-        if (optionalAccount.isEmpty()) {
-            throw new AccountNotFoundException("Account not found");
-        }
-        Account account = optionalAccount.get();
-
+        Account account = accountRepository.findByAccountNumber(transactionRequestDTO.getAccountNumber())
+                .orElseThrow(() -> new AccountNotFoundException("Account not found"));
 
         Double newBalance = account.getBalance() + transactionRequestDTO.getAmount();
         account.setBalance(newBalance);
@@ -43,7 +40,7 @@ public class TransactionService {
         Transaction transaction = Transaction.builder()
                 .transactionType(TransactionType.DEPOSIT)
                 .amount(transactionRequestDTO.getAmount())
-                .account(account)
+                .accountNumber(account.getAccountNumber())
                 .transactionDate(LocalDateTime.now())
                 .build();
 
@@ -53,23 +50,22 @@ public class TransactionService {
 
         return TransactionResponseDTO.builder()
                 .transactionId(savedTransaction.getId())
-//                .accountNumber(account.getAccountNumber())
+                .senderAccountNumber(account.getAccountNumber())
+//                .recipientAccountNumber(account.getAccountNumber())
                 .balance(newBalance)
                 .transactionType(TransactionType.DEPOSIT)
                 .transactionDate(savedTransaction.getTransactionDate())
+                .message("Deposit successful")
                 .build();
+
     }
 
     @Transactional
     public TransactionResponseDTO withdraw(TransactionRequestDTO transactionRequestDTO) {
         checkAmount(transactionRequestDTO.getAmount());
 
-        Optional<Account> optionalAccount = accountRepository.findByAccountNumber(transactionRequestDTO.getAccountNumber());
-
-        if (optionalAccount.isEmpty()) {
-            throw new AccountNotFoundException("Account not found");
-        }
-        Account account = optionalAccount.get();
+        Account account = accountRepository.findByAccountNumber(transactionRequestDTO.getAccountNumber())
+                .orElseThrow(() -> new AccountNotFoundException("Account not found"));
 
         if (account.getBalance() < transactionRequestDTO.getAmount()) {
             throw new IllegalArgumentException("Insufficient funds");
@@ -81,61 +77,64 @@ public class TransactionService {
         Transaction transaction = Transaction.builder()
                 .transactionType(TransactionType.WITHDRAW)
                 .amount(transactionRequestDTO.getAmount())
-                .account(account)
+                .accountNumber(account.getAccountNumber())
                 .transactionDate(LocalDateTime.now())
                 .build();
-
         Transaction savedTransaction = transactionRepository.save(transaction);
 
         accountRepository.save(account);
 
         return TransactionResponseDTO.builder()
                 .transactionId(savedTransaction.getId())
+                .senderAccountNumber(account.getAccountNumber())
                 .balance(newBalance)
                 .transactionType(TransactionType.WITHDRAW)
                 .transactionDate(savedTransaction.getTransactionDate())
+                .message("Withdrawal successful")
                 .build();
     }
 
+
     @Transactional
     public TransactionResponseDTO transfer(TransactionRequestDTO transactionRequestDTO) {
+        if (transactionRequestDTO.getRecipientAccountNumber() == null) {
+            throw new IllegalArgumentException("Receiver account number is required for transfers.");
+        }
+
         checkAmount(transactionRequestDTO.getAmount());
 
-        Optional<Account> sender = accountRepository.findByAccountNumber(transactionRequestDTO.getAccountNumber());
-        Optional<Account> receiver = accountRepository.findByAccountNumber(transactionRequestDTO.getRecipientAccountNumber());
+        Account senderAccount = accountRepository.findByAccountNumber(transactionRequestDTO.getAccountNumber())
+                .orElseThrow(() -> new AccountNotFoundException("Sender account not found"));
 
-        if (sender.isEmpty() || receiver.isEmpty()) {
-            throw new AccountNotFoundException("Account not found");
-        }
-        Account senderAccount = sender.get();
-        Account receiverAccount = receiver.get();
+        Account receiverAccount = accountRepository.findByAccountNumber(transactionRequestDTO.getRecipientAccountNumber())
+                .orElseThrow(() -> new AccountNotFoundException("Receiver account not found"));
 
         if (senderAccount.getBalance() < transactionRequestDTO.getAmount()) {
             throw new IllegalArgumentException("Insufficient funds");
         }
 
-        Double newBalanceSender = senderAccount.getBalance() - transactionRequestDTO.getAmount();
-        Double newBalanceReceiver = receiverAccount.getBalance() + transactionRequestDTO.getAmount();
-        senderAccount.setBalance(newBalanceSender);
-        receiverAccount.setBalance(newBalanceReceiver);
+        senderAccount.setBalance(senderAccount.getBalance() - transactionRequestDTO.getAmount());
+        receiverAccount.setBalance(receiverAccount.getBalance() + transactionRequestDTO.getAmount());
 
         Transaction senderTransaction = Transaction.builder()
                 .transactionType(TransactionType.TRANSFER_OUT)
                 .amount(transactionRequestDTO.getAmount())
-                .account(senderAccount)
+                .accountNumber(senderAccount.getAccountNumber())
+                .receiverAccountNumber(receiverAccount.getAccountNumber())
                 .transactionDate(LocalDateTime.now())
                 .build();
 
         Transaction receiverTransaction = Transaction.builder()
                 .transactionType(TransactionType.TRANSFER_IN)
                 .amount(transactionRequestDTO.getAmount())
-                .account(receiverAccount)
-                .receiverAccount(receiverAccount)
+                .accountNumber(receiverAccount.getAccountNumber())
+                .receiverAccountNumber(senderAccount.getAccountNumber())
                 .transactionDate(LocalDateTime.now())
                 .build();
 
         transactionRepository.save(senderTransaction);
         transactionRepository.save(receiverTransaction);
+
         accountRepository.save(senderAccount);
         accountRepository.save(receiverAccount);
 
@@ -143,30 +142,33 @@ public class TransactionService {
                 .transactionId(senderTransaction.getId())
                 .senderAccountNumber(senderAccount.getAccountNumber())
                 .recipientAccountNumber(receiverAccount.getAccountNumber())
-                .balance(newBalanceSender)
+                .balance(senderAccount.getBalance())
                 .transactionType(TransactionType.TRANSFER_OUT)
                 .transactionDate(senderTransaction.getTransactionDate())
+                .message("Funds transferred successfully")
                 .build();
     }
+
 
     @Transactional
     public List<TransactionResponseDTO> getAllTransactionsByUserId(UUID userId) {
         Account account = accountRepository.findByUserId(userId)
                 .orElseThrow(() -> new AccountNotFoundException("Account not found"));
 
-        List<Transaction> transactions = transactionRepository.findByAccountOrderByTransactionDateDesc(account);
+        List<Transaction> transactions = transactionRepository.findByAccountNumberOrderByTransactionDateDesc(account.getAccountNumber());
 
         return transactions.stream()
                 .map(transaction -> TransactionResponseDTO.builder()
                         .transactionId(transaction.getId())
-                        .senderAccountNumber(transaction.getAccount().getAccountNumber())
-                        .recipientAccountNumber(transaction.getReceiverAccount() != null ? transaction.getReceiverAccount().getAccountNumber() : null)
+                        .senderAccountNumber(transaction.getAccountNumber())
+                        .recipientAccountNumber(transaction.getReceiverAccountNumber())
                         .amount(transaction.getAmount())
-                        .balance(transaction.getAccount().getBalance())
+                        .balance(account.getBalance())
                         .transactionType(transaction.getTransactionType())
                         .transactionDate(transaction.getTransactionDate())
                         .build())
                 .collect(Collectors.toList());
+
     }
 
     public void checkAmount(Double amount) {

@@ -20,8 +20,6 @@ const AccountPage = () => {
 
   const refreshIntervalRef = useRef(null);
 
-  console.log('transactions ===', transactions);
-
   const fetchData = async () => {
     if (!token) {
       setError('User is not logged in');
@@ -133,7 +131,6 @@ const AccountPage = () => {
       });
 
       const response = await postTransfer(amount, accountData.accountNumber, recipientAccount);
-
       setAccountData({
         ...accountData,
         balance: response.balance,
@@ -301,15 +298,16 @@ const AccountPage = () => {
             <tbody>
               {transactions.map((transaction) => {
                 const formatDate = (dateString) => {
-                  const date = new Date(dateString);
-                  const year = date.getFullYear();
-                  const month = String(date.getMonth() + 1).padStart(2, '0');
-                  const day = String(date.getDate()).padStart(2, '0');
-                  const hours = String(date.getHours()).padStart(2, '0');
-                  const minutes = String(date.getMinutes()).padStart(2, '0');
-                  const seconds = String(date.getSeconds()).padStart(2, '0');
-
-                  return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+                  return new Date(dateString).toLocaleString('lt-LT', {
+                    timeZone: 'Europe/Vilnius',
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                    hour12: false,
+                  });
                 };
 
                 return (
@@ -329,9 +327,11 @@ const AccountPage = () => {
                       EUR
                     </td>
                     <td className='border border-gray-300 px-2 sm:px-4 py-2 text-gray-600'>
-                      {transaction.senderAccountNumber !== transaction.recipientAccountNumber
+                      {transaction.transactionType === 'TRANSFER_OUT'
+                        ? transaction.recipientAccountNumber
+                        : transaction.transactionType === 'TRANSFER_IN'
                         ? transaction.senderAccountNumber
-                        : transaction.recipientAccountNumber}
+                        : transaction.senderAccountNumber}
                     </td>
                     <td className='border border-gray-300 px-2 sm:px-4 py-2 text-gray-600'>
                       {formatDate(transaction.transactionDate)}

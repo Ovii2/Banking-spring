@@ -18,15 +18,15 @@ import org.example.bankingapplication.enums.TransactionType;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class TransactionRequestDTO {
 
-//    @NotBlank(message = "Account number is required")
+    @NotNull(message = "Account number is required")
     private String accountNumber;
 
-//    @NotBlank(message = "Recipient account number is required")
     private String recipientAccountNumber;
 
-//    @NotNull(message = "Amount is required")
-//    @Positive(message = "Amount must be positive")
+    @NotNull(message = "Amount is required")
+    @Positive(message = "Amount must be positive")
     private Double amount;
 
+//    @NotNull(message = "Transaction type is required")
     private TransactionType transactionType;
 }
