@@ -330,7 +330,7 @@ const AccountPage = () => {
                       {transaction.transactionType === 'TRANSFER_OUT'
                         ? transaction.recipientAccountNumber
                         : transaction.transactionType === 'TRANSFER_IN'
-                        ? transaction.senderAccountNumber
+                        ? transaction.recipientAccountNumber
                         : transaction.senderAccountNumber}
                     </td>
                     <td className='border border-gray-300 px-2 sm:px-4 py-2 text-gray-600'>
