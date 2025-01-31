@@ -37,11 +37,11 @@ Technologies Used
 
 Navigate to the banking-application directory
 
-`Run ./gradlew clean build to build the project`
+Run `./gradlew clean build` to build the project`
 
-`Run ./gradlew bootRun to start the server`
+Run `./gradlew run` to start the server
 
-Start the frontend development server:
+### Start the frontend development server:
 
 Navigate to the frontend directory
 Run `npm install` to install dependencies
