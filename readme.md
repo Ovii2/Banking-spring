@@ -29,20 +29,22 @@ Technologies Used
 ## Setup and Installation
 
 - Clone the repository
-- Set up the MySQL database:
-- Create a new database
-- Update the database connection details in the application.properties file
+- Set up the MySQL database
+
+  - Create a new database
+  - Update the database connection details in the application.properties file
 
 ### Build and run the backend server:
 
 Navigate to the banking-application directory
 
-Run `./gradlew clean build` to build the project`
+Run `mvn clean install` to build the project.
 
-Run `./gradlew run` to start the server
+Run `mvn spring-boot:run` to start the server.
 
 ### Start the frontend development server:
 
 Navigate to the frontend directory
-Run `npm install` to install dependencies
+Run `npm install` or `npm i` to install dependencies
+
 Run `npm run dev` to start the development server
