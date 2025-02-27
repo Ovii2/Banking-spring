@@ -1,9 +1,7 @@
 package org.example.bankingapplication.controllers;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.example.bankingapplication.dto.transaction.TransactionRequestDTO;
 import org.example.bankingapplication.dto.transaction.TransactionResponseDTO;
 import org.example.bankingapplication.exceptions.AccountNotFoundException;
@@ -16,10 +14,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
-@Slf4j
 @RestController
 @RequiredArgsConstructor
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "http://localhost:5173")
 @RequestMapping("/api/v1/account/transactions")
 public class TransactionController {
 

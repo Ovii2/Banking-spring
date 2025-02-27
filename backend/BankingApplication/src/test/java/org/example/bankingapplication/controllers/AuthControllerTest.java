@@ -36,15 +36,6 @@ class AuthControllerTest {
     @MockitoBean
     private AuthService authService;
 
-    @MockitoBean
-    private JwtService jwtService;
-
-    @MockitoBean
-    private TokenRepository tokenRepository;
-
-    @MockitoBean
-    private UserDetailsService userDetailsService;
-
     @Autowired
     private ObjectMapper objectMapper;
 
@@ -124,10 +115,6 @@ class AuthControllerTest {
         LoginRequestDTO loginRequestDTO = LoginRequestDTO.builder()
                 .username("NonExisting")
                 .password("password")
-                .build();
-
-        LoginResponseDTO loginResponseDTO = LoginResponseDTO.builder()
-                .message("User not found")
                 .build();
 
         when(authService.login(any(LoginRequestDTO.class))).thenThrow(new UserNotFoundException("User not found"));
