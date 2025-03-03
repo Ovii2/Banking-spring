@@ -20,6 +20,10 @@ public class TokenService {
     private final HttpServletRequest request;
 
     public void saveUserToken(User user, String jwtToken) {
+        if (user == null || jwtToken == null) {
+            throw new IllegalArgumentException("User and JWT token must not be null");
+        }
+
         var token = Token.builder()
                 .user(user)
                 .token(jwtToken)
