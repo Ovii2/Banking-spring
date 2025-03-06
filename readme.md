@@ -3,7 +3,6 @@
 ### Overview
 
 This is a banking application built using React, Spring Boot, and MySQL. It allows users to manage their bank accounts, including performing deposit, withdrawal, and transfer operations, as well as viewing their transaction history.
-Features
 
 ### Usage
 
