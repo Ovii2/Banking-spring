@@ -25,6 +25,13 @@ Technologies Used
 - Database: MySQL
 - Other: JWT for authentication, Lombok for boilerplate code
 
+
+UI preview
+
+<img src="./frontend/src/assets/demo/Account1.png" alt="Desktop preview" width="300" />
+<img src="./frontend/src/assets/demo/video.gif" alt="Desktop preview" width="300" />
+
+
 ## Setup and Installation
 
 - Clone the repository
