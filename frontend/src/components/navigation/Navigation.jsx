@@ -30,7 +30,10 @@ const Navigation = () => {
   const filteredNavigation = isLoggedIn
     ? navigation.filter((item) => item.name === 'Account')
     : navigation.filter(
-        (item) => item.name === 'Home' || item.name === 'Login' || item.name === 'Register'
+        (item) =>
+          item.name === 'Home' ||
+          item.name === 'Login' ||
+          item.name === 'Register'
       );
 
   return (
@@ -42,15 +45,21 @@ const Navigation = () => {
             <DisclosureButton className='group relative inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-gray-700 hover:text-white focus:ring-2 focus:ring-white focus:outline-hidden focus:ring-inset'>
               <span className='absolute -inset-0.5' />
               <span className='sr-only'>Open main menu</span>
-              <Bars3Icon aria-hidden='true' className='block size-6 group-data-open:hidden' />
-              <XMarkIcon aria-hidden='true' className='hidden size-6 group-data-open:block' />
+              <Bars3Icon
+                aria-hidden='true'
+                className='block size-6 group-data-open:hidden'
+              />
+              <XMarkIcon
+                aria-hidden='true'
+                className='hidden size-6 group-data-open:block'
+              />
             </DisclosureButton>
           </div>
           <div className='flex flex-1 items-center justify-center sm:items-stretch sm:justify-start'>
             <div className='flex shrink-0 items-center'>
               <img
-                alt='Your Company'
-                src='https://tailwindui.com/plus/img/logos/mark.svg?color=indigo&shade=500'
+                alt='Company logo'
+                src='/src/assets/icons/logo.png'
                 className='h-8 w-auto'
               />
             </div>
@@ -60,7 +69,9 @@ const Navigation = () => {
                   <Link
                     key={item.name}
                     to={item.href}
-                    aria-current={location.pathname === item.href ? 'page' : undefined}
+                    aria-current={
+                      location.pathname === item.href ? 'page' : undefined
+                    }
                     className={classNames(
                       location.pathname === item.href
                         ? 'bg-gray-900 text-white'
@@ -140,7 +151,9 @@ const Navigation = () => {
               key={item.name}
               as='a'
               href={item.href}
-              aria-current={location.pathname === item.href ? 'page' : undefined}
+              aria-current={
+                location.pathname === item.href ? 'page' : undefined
+              }
               className={classNames(
                 location.pathname === item.href
                   ? 'bg-gray-900 text-white'

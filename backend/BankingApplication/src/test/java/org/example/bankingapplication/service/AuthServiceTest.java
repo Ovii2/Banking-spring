@@ -177,14 +177,14 @@ class AuthServiceTest {
     @Test
     @DisplayName("generateAccountNumber_ShouldGenerateValidAccountNumber")
     void generateAccountNumberShouldGenerateValidAccountNumber() {
-        String accountNumber1 = AuthService.generateAccountNumber();
-        String accountNumber2 = AuthService.generateAccountNumber();
+        String accountNumber1 = AccountService.generateAccountNumber();
+        String accountNumber2 = AccountService.generateAccountNumber();
 
         assertNotNull(accountNumber1);
         assertNotNull(accountNumber2);
 
-        assertEquals(16, accountNumber1.length());
-        assertEquals(16, accountNumber2.length());
+        assertEquals(20, accountNumber1.length());
+        assertEquals(20, accountNumber2.length());
 
         assertNotEquals(accountNumber1, accountNumber2, "Account numbers should be unique");
     }

@@ -11,8 +11,6 @@ import org.example.bankingapplication.enums.Roles;
 import org.example.bankingapplication.exceptions.UserAlreadyExistsException;
 import org.example.bankingapplication.exceptions.UserAlreadyLoggedInException;
 import org.example.bankingapplication.model.User;
-import org.example.bankingapplication.repository.AccountRepository;
-import org.example.bankingapplication.repository.TokenRepository;
 import org.example.bankingapplication.repository.UserRepository;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -22,8 +20,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.Optional;
-import java.util.Random;
 
 @Service
 @RequiredArgsConstructor
@@ -34,8 +32,6 @@ public class AuthService {
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
     private final TokenService tokenService;
-    private final TokenRepository tokenRepository;
-    private final AccountRepository accountRepository;
     private final AccountService accountService;
 
     @Transactional
@@ -47,9 +43,9 @@ public class AuthService {
             throw new UserAlreadyExistsException("This username already exists!");
         }
 
-        String accountNumber = generateAccountNumber();
+        String accountNumber = AccountService.generateAccountNumber();
         if (userRepository.existsByAccountNumber(accountNumber)) {
-            accountNumber = generateAccountNumber();
+            accountNumber = AccountService.generateAccountNumber();
         }
 
         User user = User.builder()
@@ -64,7 +60,7 @@ public class AuthService {
         AccountRequestDTO accountRequestDTO = AccountRequestDTO.builder()
                 .userId(user.getId())
                 .accountNumber(accountNumber)
-                .initialDeposit(0.0)
+                .initialDeposit(BigDecimal.ZERO)
                 .build();
 
         accountService.createAccount(accountRequestDTO);
@@ -92,16 +88,6 @@ public class AuthService {
                 .token(jwtToken)
                 .message("User logged in successfully")
                 .build();
-    }
-
-    public static String generateAccountNumber() {
-        String countryCode = "LT";
-        Random random = new Random();
-        StringBuilder accountNumber = new StringBuilder(countryCode);
-        for (int i = 0; i < 14; i++) {
-            accountNumber.append(random.nextInt(10));
-        }
-        return accountNumber.toString();
     }
 
     public Optional<User> getCurrentUser() {

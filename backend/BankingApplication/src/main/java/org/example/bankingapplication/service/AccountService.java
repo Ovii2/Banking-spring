@@ -10,8 +10,11 @@ import org.example.bankingapplication.repository.AccountRepository;
 import org.example.bankingapplication.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.HashSet;
+import java.util.Random;
 import java.util.UUID;
+import java.util.stream.IntStream;
 
 @Service
 @RequiredArgsConstructor
@@ -35,7 +38,7 @@ public class AccountService {
         Account account = Account.builder()
                 .accountNumber(accountRequestDTO.getAccountNumber())
                 .ownerName(user.getUsername())
-                .balance(accountRequestDTO.getInitialDeposit() != null ? accountRequestDTO.getInitialDeposit() : 0.0)
+                .balance(accountRequestDTO.getInitialDeposit() != null ? accountRequestDTO.getInitialDeposit() : BigDecimal.ZERO)
                 .user(user)
                 .build();
 
@@ -60,5 +63,16 @@ public class AccountService {
                         .balance(account.getBalance())
                         .build())
                 .orElseThrow(() -> new AccountNotFoundException("Account not found for user: " + userId));
+    }
+
+    public static String generateAccountNumber() {
+        String countryCode = "LT";
+        Random random = new Random();
+        StringBuilder accountNumber = new StringBuilder(countryCode);
+        accountNumber.append(random.nextInt(90) + 10);
+        IntStream.range(0, 16).
+                forEach(i -> accountNumber.append(random.nextInt(10)));
+
+        return accountNumber.toString();
     }
 }

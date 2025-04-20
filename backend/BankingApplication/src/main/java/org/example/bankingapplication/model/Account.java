@@ -3,6 +3,7 @@ package org.example.bankingapplication.model;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 @Entity
@@ -25,7 +26,7 @@ public class Account {
     private String ownerName;
 
     @Column(name = "balance", nullable = false)
-    private Double balance;
+    private BigDecimal balance;
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
@@ -34,7 +35,7 @@ public class Account {
     @PrePersist
     public void onCreate() {
         if (this.balance == null) {
-            this.balance = 0.0;
+            this.balance = BigDecimal.ZERO;
         }
     }
 }

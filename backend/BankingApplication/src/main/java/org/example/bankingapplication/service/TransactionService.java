@@ -13,12 +13,12 @@ import org.example.bankingapplication.repository.AccountRepository;
 import org.example.bankingapplication.repository.TransactionRepository;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class TransactionService {
@@ -31,10 +31,10 @@ public class TransactionService {
     public TransactionResponseDTO deposit(TransactionRequestDTO transactionRequestDTO) {
         checkAmount(transactionRequestDTO.getAmount());
 
-        Account account = accountRepository.findByAccountNumber(transactionRequestDTO.getAccountNumber())
+        Account account = accountRepository.findByAccountNumber(transactionRequestDTO.getSenderAccountNumber())
                 .orElseThrow(() -> new AccountNotFoundException("Account not found"));
 
-        Double newBalance = account.getBalance() + transactionRequestDTO.getAmount();
+        BigDecimal newBalance = account.getBalance().add(transactionRequestDTO.getAmount());
         account.setBalance(newBalance);
 
         Transaction transaction = Transaction.builder()
@@ -51,7 +51,6 @@ public class TransactionService {
         return TransactionResponseDTO.builder()
                 .transactionId(savedTransaction.getId())
                 .senderAccountNumber(account.getAccountNumber())
-//                .recipientAccountNumber(account.getAccountNumber())
                 .balance(newBalance)
                 .transactionType(TransactionType.DEPOSIT)
                 .transactionDate(savedTransaction.getTransactionDate())
@@ -64,14 +63,14 @@ public class TransactionService {
     public TransactionResponseDTO withdraw(TransactionRequestDTO transactionRequestDTO) {
         checkAmount(transactionRequestDTO.getAmount());
 
-        Account account = accountRepository.findByAccountNumber(transactionRequestDTO.getAccountNumber())
+        Account account = accountRepository.findByAccountNumber(transactionRequestDTO.getSenderAccountNumber())
                 .orElseThrow(() -> new AccountNotFoundException("Account not found"));
 
-        if (account.getBalance() < transactionRequestDTO.getAmount()) {
+        if (account.getBalance().compareTo(transactionRequestDTO.getAmount()) < 0) {
             throw new IllegalArgumentException("Insufficient funds");
         }
 
-        Double newBalance = account.getBalance() - transactionRequestDTO.getAmount();
+        BigDecimal newBalance = account.getBalance().subtract(transactionRequestDTO.getAmount());
         account.setBalance(newBalance);
 
         Transaction transaction = Transaction.builder()
@@ -103,18 +102,18 @@ public class TransactionService {
 
         checkAmount(transactionRequestDTO.getAmount());
 
-        Account senderAccount = accountRepository.findByAccountNumber(transactionRequestDTO.getAccountNumber())
+        Account senderAccount = accountRepository.findByAccountNumber(transactionRequestDTO.getSenderAccountNumber())
                 .orElseThrow(() -> new AccountNotFoundException("Sender account not found"));
 
         Account receiverAccount = accountRepository.findByAccountNumber(transactionRequestDTO.getRecipientAccountNumber())
                 .orElseThrow(() -> new AccountNotFoundException("Receiver account not found"));
 
-        if (senderAccount.getBalance() < transactionRequestDTO.getAmount()) {
+        if (senderAccount.getBalance().compareTo(transactionRequestDTO.getAmount()) < 0) {
             throw new IllegalArgumentException("Insufficient funds");
         }
 
-        senderAccount.setBalance(senderAccount.getBalance() - transactionRequestDTO.getAmount());
-        receiverAccount.setBalance(receiverAccount.getBalance() + transactionRequestDTO.getAmount());
+        senderAccount.setBalance(senderAccount.getBalance().subtract(transactionRequestDTO.getAmount()));
+        receiverAccount.setBalance(receiverAccount.getBalance().add(transactionRequestDTO.getAmount()));
 
         Transaction senderTransaction = Transaction.builder()
                 .transactionType(TransactionType.TRANSFER_OUT)
@@ -171,8 +170,8 @@ public class TransactionService {
 
     }
 
-    public void checkAmount(Double amount) {
-        if (amount == null || amount <= 0) {
+    public void checkAmount(BigDecimal amount) {
+        if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
             throw new IllegalArgumentException("Amount must be greater than zero");
         }
     }

@@ -48,7 +48,7 @@ const RegisterForm = () => {
       <div className='sm:mx-auto sm:w-full sm:max-w-sm'>
         <img
           alt='Your Company'
-          src='https://tailwindui.com/plus/img/logos/mark.svg?color=indigo&shade=600'
+          src='/src/assets/icons/logo.png'
           className='mx-auto h-10 w-auto'
         />
         <h2 className='mt-10 text-center text-2xl/9 font-bold tracking-tight text-gray-900'>
@@ -57,9 +57,16 @@ const RegisterForm = () => {
       </div>
 
       <div className='mt-10 sm:mx-auto sm:w-full sm:max-w-sm'>
-        <form className='space-y-6' noValidate onSubmit={handleSubmit(formSubmitHandler)}>
+        <form
+          className='space-y-6'
+          noValidate
+          onSubmit={handleSubmit(formSubmitHandler)}
+        >
           <div>
-            <label htmlFor='email' className='block text-sm/6 font-medium text-gray-900'>
+            <label
+              htmlFor='email'
+              className='block text-sm/6 font-medium text-gray-900'
+            >
               Email address
             </label>
             <div className='mt-2'>
@@ -78,7 +85,10 @@ const RegisterForm = () => {
           </div>
 
           <div>
-            <label htmlFor='username' className='block text-sm/6 font-medium text-gray-900'>
+            <label
+              htmlFor='username'
+              className='block text-sm/6 font-medium text-gray-900'
+            >
               Username
             </label>
             <div className='mt-2'>
@@ -98,11 +108,17 @@ const RegisterForm = () => {
 
           <div>
             <div className='flex items-center justify-between'>
-              <label htmlFor='password' className='block text-sm/6 font-medium text-gray-900'>
+              <label
+                htmlFor='password'
+                className='block text-sm/6 font-medium text-gray-900'
+              >
                 Password
               </label>
               <div className='text-sm'>
-                <a href='#' className='font-semibold text-indigo-600 hover:text-indigo-500'>
+                <a
+                  href='#'
+                  className='font-semibold text-indigo-600 hover:text-indigo-500'
+                >
                   Forgot password?
                 </a>
               </div>
@@ -134,7 +150,10 @@ const RegisterForm = () => {
 
         <p className='mt-10 text-center text-sm/6 text-gray-500'>
           Not a member?{' '}
-          <a href='#' className='font-semibold text-indigo-600 hover:text-indigo-500'>
+          <a
+            href='#'
+            className='font-semibold text-indigo-600 hover:text-indigo-500'
+          >
             Start a 14 day free trial
           </a>
         </p>

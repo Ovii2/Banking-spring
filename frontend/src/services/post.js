@@ -30,13 +30,13 @@ export const postRegister = async (data) => {
   }
 };
 
-export const postDeposit = async (amount, accountNumber) => {
+export const postDeposit = async ({ amount, senderAccountNumber }) => {
   try {
     const resp = await axios.post(
       `${API_URL}/api/v1/account/transactions/deposit`,
       {
         amount: parseFloat(amount),
-        accountNumber: accountNumber,
+        senderAccountNumber,
       },
       {
         headers: {
@@ -51,13 +51,13 @@ export const postDeposit = async (amount, accountNumber) => {
   }
 };
 
-export const postWithdraw = async (amount, accountNumber) => {
+export const postWithdraw = async ({ amount, senderAccountNumber }) => {
   try {
     const resp = await axios.post(
       `${API_URL}/api/v1/account/transactions/withdraw`,
       {
         amount: parseFloat(amount),
-        accountNumber: accountNumber,
+        senderAccountNumber,
       },
       {
         headers: {
@@ -72,14 +72,18 @@ export const postWithdraw = async (amount, accountNumber) => {
   }
 };
 
-export const postTransfer = async (amount, accountNumber, recipientAccountNumber) => {
+export const postTransfer = async ({
+  amount,
+  senderAccountNumber,
+  recipientAccountNumber,
+}) => {
   try {
     const resp = await axios.post(
       `${API_URL}/api/v1/account/transactions/transfer`,
       {
         amount: parseFloat(amount),
-        accountNumber: accountNumber,
-        recipientAccountNumber: recipientAccountNumber,
+        senderAccountNumber,
+        recipientAccountNumber,
       },
       {
         headers: {

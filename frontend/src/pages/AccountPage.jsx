@@ -72,7 +72,10 @@ const AccountPage = () => {
         balance: updatedBalance,
       });
 
-      const response = await postDeposit(amount, accountData.accountNumber);
+      const response = await postDeposit({
+        amount,
+        senderAccountNumber: accountData.accountNumber,
+      });
 
       setAccountData({
         ...accountData,
@@ -101,7 +104,10 @@ const AccountPage = () => {
         balance: updatedBalance,
       });
 
-      const response = await postWithdraw(amount, accountData.accountNumber);
+      const response = await postWithdraw({
+        amount,
+        senderAccountNumber: accountData.accountNumber,
+      });
 
       setAccountData({
         ...accountData,
@@ -130,7 +136,11 @@ const AccountPage = () => {
         balance: updatedBalance,
       });
 
-      const response = await postTransfer(amount, accountData.accountNumber, recipientAccount);
+      const response = await postTransfer({
+        amount,
+        senderAccountNumber: accountData.accountNumber,
+        recipientAccountNumber: recipientAccount.replace(/\s+/g, ''),
+      });
       setAccountData({
         ...accountData,
         balance: response.balance,
@@ -156,7 +166,9 @@ const AccountPage = () => {
       <main className='p-4 sm:p-6 bg-gray-100 min-h-screen'>
         {/* Balance Card */}
         <div className='mb-4 sm:mb-8 bg-white rounded-lg shadow p-4 sm:p-6'>
-          <p className='text-xl sm:text-2xl font-semibold text-gray-700'>Account Balance:</p>
+          <p className='text-xl sm:text-2xl font-semibold text-gray-700'>
+            Account Balance:
+          </p>
           <p className='mt-2 sm:mt-4 text-2xl sm:text-3xl font-bold text-green-500'>
             {accountData?.balance?.toFixed(2)} EUR
           </p>
@@ -168,7 +180,7 @@ const AccountPage = () => {
             {`${accountData?.ownerName} Bank Account` || 'Bank Account'}
           </p>
           <p className='text-lg sm:text-xl font-medium text-gray-900 mt-2'>
-            {accountData?.accountNumber}
+            {accountData?.accountNumber?.replace(/(.{4})/g, '$1 ').trim()}
           </p>
         </div>
 
@@ -327,11 +339,14 @@ const AccountPage = () => {
                       EUR
                     </td>
                     <td className='border border-gray-300 px-2 sm:px-4 py-2 text-gray-600'>
-                      {transaction.transactionType === 'TRANSFER_OUT'
+                      {(transaction.transactionType === 'TRANSFER_OUT'
                         ? transaction.recipientAccountNumber
                         : transaction.transactionType === 'TRANSFER_IN'
                         ? transaction.recipientAccountNumber
-                        : transaction.senderAccountNumber}
+                        : transaction.senderAccountNumber
+                      )
+                        ?.replace(/(.{4})/g, '$1 ')
+                        .trim()}
                     </td>
                     <td className='border border-gray-300 px-2 sm:px-4 py-2 text-gray-600'>
                       {formatDate(transaction.transactionDate)}

@@ -1,6 +1,5 @@
 package org.example.bankingapplication.repository;
 
-import org.example.bankingapplication.model.Account;
 import org.example.bankingapplication.model.Transaction;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -12,9 +11,5 @@ import java.util.UUID;
 public interface TransactionRepository extends JpaRepository<Transaction, UUID> {
 
     List<Transaction> findByAccountNumberOrderByTransactionDateDesc(String accountNumber);
-
-    List<Transaction> findByAccountNumber(Account accountNumber);
-
-    List<Transaction> findByReceiverAccountNumber(Account receiverAccountNumber);
 
 }

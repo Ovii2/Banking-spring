@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 @Data
@@ -18,7 +19,7 @@ public class AccountResponseDTO {
     private UUID accountId;
     private String accountNumber;
     private String ownerName;
-    private Double balance;
+    private BigDecimal balance;
     private String message;
 
     public AccountResponseDTO(String message) {
